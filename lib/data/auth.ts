@@ -22,7 +22,12 @@ export async function requireUser() {
 export async function requireAdmin() {
   const user = await requireUser();
   const supabase = await createServerSupabaseClient();
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+  const { data: rawProfile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+  const profile = rawProfile as { role?: string } | null;
 
   if (profile?.role !== "admin") {
     redirect("/dashboard");

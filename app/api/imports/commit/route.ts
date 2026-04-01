@@ -16,7 +16,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
-    const { data: profile } = await authClient.from("profiles").select("role").eq("id", user.id).maybeSingle();
+    const { data: rawProfile } = await authClient
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    const profile = rawProfile as { role?: string } | null;
     if (profile?.role !== "admin") {
       return NextResponse.json({ error: "Admin access required." }, { status: 403 });
     }
